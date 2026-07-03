@@ -11,7 +11,7 @@ You may complete this model card for whichever version you used, or compare both
 
 **Model type:**  
 Describe whether you used the rule based model, the ML model, or both.  
-Example: “I used the rule based model only” or “I compared both models.”
+I used the rule-based model but did perform a comparision of both models. 
 
 **Intended purpose:**  
 What is this model trying to do?  

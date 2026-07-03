@@ -23,6 +23,10 @@ POSITIVE_WORDS = [
     "chill",
     "relaxed",
     "amazing",
+    "hopeful",
+    "proud",
+    "grateful",
+    "passed",
 ]
 
 NEGATIVE_WORDS = [
@@ -36,6 +40,15 @@ NEGATIVE_WORDS = [
     "stressed",
     "hate",
     "boring",
+    "exhausted",
+    "anxious",
+    "stuck",
+    "traffic",
+    "waiting",
+    "late",
+    "delayed",
+    "annoying",
+    "frustrating",
 ]
 
 # ---------------------------------------------------------------------
@@ -50,6 +63,21 @@ SAMPLE_POSTS = [
     "This is fine",
     "So excited for the weekend",
     "I am not happy about this",
+    "I am not feeling good",
+    "No cap this made my whole day 😂",
+    "This meeting could have been an email 💀",
+    "Lowkey exhausted but proud I got everything done",
+    "I passed the test but I still feel weirdly anxious",
+    "Bruh today was actually amazing",
+    "Highkey grateful for my friends today :)",
+    "Lowkey this pizza fixed my mood",
+    "I absolutely love getting stuck in traffic :)",
+    "Not gonna lie, I am stressed and excited at the same time",
+    "Nothing really happened today",
+    "No cap that movie was boring 💀",
+    "I miss my old routine but this new job is kind of fun",
+    "Finally finished my project 😂",
+    "Everything is fine I guess 🥲"
 ]
 
 # Human labels for each post above.
@@ -64,31 +92,20 @@ TRUE_LABELS = [
     "mixed",     # "Feeling tired but kind of hopeful"
     "neutral",   # "This is fine"
     "positive",  # "So excited for the weekend"
-    "negative",  # "I am not happy about this"
+    "negative",  # "I am not happy about this",
+    "negative", # I am not feeling good
+    "positive", # No cap this made my whole day 😂
+    "negative", # This meeting could have been an email 💀
+    "mixed", # Lowkey exhausted but proud I got everything done
+    "mixed", # I passed the test but I still feel weirdly anxious
+    "positive", # Bruh today was actually amazing
+    "positive", # Highkey grateful for my friends today :)
+    "positive", # Lowkey this pizza fixed my mood
+    "negative", # I absolutely love getting stuck in traffic :)
+    "mixed", # Not gonna lie, I am stressed and excited at the same time
+    "neutral", # Nothing really happened today
+    "negative", # No cap that movie was boring 💀
+    "mixed", # I miss my old routine but this new job is kind of fun
+    "positive", # Finally finished my project 😂
+    "mixed" # Everything is fine I guess 🥲
 ]
-
-# TODO: Add 5-10 more posts and labels.
-#
-# Requirements:
-#   - For every new post you add to SAMPLE_POSTS, you must add one
-#     matching label to TRUE_LABELS.
-#   - SAMPLE_POSTS and TRUE_LABELS must always have the same length.
-#   - Include a variety of language styles, such as:
-#       * Slang ("lowkey", "highkey", "no cap")
-#       * Emojis (":)", ":(", "🥲", "😂", "💀")
-#       * Sarcasm ("I absolutely love getting stuck in traffic")
-#       * Ambiguous or mixed feelings
-#
-# Tips:
-#   - Try to create some examples that are hard to label even for you.
-#   - Make a note of any examples that you and a friend might disagree on.
-#     Those "edge cases" are interesting to inspect for both the rule based
-#     and ML models.
-#
-# Example of how you might extend the lists:
-#
-# SAMPLE_POSTS.append("Lowkey stressed but kind of proud of myself")
-# TRUE_LABELS.append("mixed")
-#
-# Remember to keep them aligned:
-#   len(SAMPLE_POSTS) == len(TRUE_LABELS)

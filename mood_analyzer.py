@@ -9,6 +9,8 @@ This class starts with very simple logic:
   - Convert that score into a mood label
 """
 
+import re
+import unicodedata
 from typing import List, Dict, Tuple, Optional
 
 from dataset import POSITIVE_WORDS, NEGATIVE_WORDS
@@ -38,21 +40,34 @@ class MoodAnalyzer:
 
     def preprocess(self, text: str) -> List[str]:
         """
-        Convert raw text into a list of tokens the model can work with.
+        Convert raw text into normalized tokens.
 
-        TODO: Improve this method.
-
-        Right now, it does the minimum:
-          - Strips leading and trailing whitespace
-          - Converts everything to lowercase
-          - Splits on spaces
-
-        Ideas to improve:
-          - Remove punctuation
-          - Handle simple emojis separately (":)", ":-(", "🥲", "😂")
-          - Normalize repeated characters ("soooo" -> "soo")
+        Handles:
+          - Lowercase text
+          - Repeated characters: "soooo" -> "soo"
+          - Common emojis and emoticons as separate tokens
+          - Full Unicode punctuation removal
         """
         cleaned = text.strip().lower()
+
+        # Normalize long repeated character runs: "soooo" -> "soo".
+        cleaned = re.sub(r"(.)\1{2,}", r"\1\1", cleaned)
+
+        emoji_tokens = [":)", ":-)", ":(", ":-(", "😂", "💀", "🥲", "😭", "❤️", "🔥"]
+        protected_tokens = {}
+        for index, emoji in enumerate(emoji_tokens):
+            placeholder = f"emojitoken{index}"
+            protected_tokens[placeholder] = emoji
+            cleaned = cleaned.replace(emoji, f" {placeholder} ")
+
+        cleaned = "".join(
+            " " if unicodedata.category(char).startswith("P") else char
+            for char in cleaned
+        )
+
+        for placeholder, emoji in protected_tokens.items():
+            cleaned = cleaned.replace(placeholder, emoji)
+
         tokens = cleaned.split()
 
         return tokens
@@ -75,15 +90,53 @@ class MoodAnalyzer:
           - Give some words higher weights than others (for example "hate" < "annoyed")
           - Treat emojis or slang (":)", "lol", "💀") as strong signals
         """
-        # TODO: Implement this method.
-        #   1. Call self.preprocess(text) to get tokens.
-        #   2. Loop over the tokens.
-        #   3. Increase the score for positive words, decrease for negative words.
-        #   4. Return the total score.
-        #
-        # Hint: if you implement negation, you may want to look at pairs of tokens,
-        # like ("not", "happy") or ("never", "fun").
-        pass
+        tokens = self.preprocess(text)
+        negators = {"not", "never", "no"}
+        score = 0
+
+        for index, token in enumerate(tokens):
+            value = 0
+            if token in self.positive_words:
+                value = 1
+            elif token in self.negative_words:
+                value = -1
+
+            if value and index > 0 and tokens[index - 1] in negators:
+                value *= -1
+
+            score += value
+
+        return score
+
+    def count_signals(self, text: str) -> Tuple[int, int]:
+        """
+        Count positive and negative mood signals after preprocessing.
+
+        Returns:
+          - positive_hits: number of positive signals
+          - negative_hits: number of negative signals
+        """
+        tokens = self.preprocess(text)
+        negators = {"not", "never", "no"}
+        positive_hits = 0
+        negative_hits = 0
+
+        for index, token in enumerate(tokens):
+            value = 0
+            if token in self.positive_words:
+                value = 1
+            elif token in self.negative_words:
+                value = -1
+
+            if value and index > 0 and tokens[index - 1] in negators:
+                value *= -1
+
+            if value > 0:
+                positive_hits += 1
+            elif value < 0:
+                negative_hits += 1
+
+        return positive_hits, negative_hits
 
     # ---------------------------------------------------------------------
     # Label prediction
@@ -105,12 +158,16 @@ class MoodAnalyzer:
         Just remember that whatever labels you return should match the labels
         you use in TRUE_LABELS in dataset.py if you care about accuracy.
         """
-        # TODO: Implement this method.
-        #   1. Call self.score_text(text) to get the numeric score.
-        #   2. Return "positive" if the score is above 0.
-        #   3. Return "negative" if the score is below 0.
-        #   4. Return "neutral" otherwise.
-        pass
+        positive_hits, negative_hits = self.count_signals(text)
+        score = self.score_text(text)
+
+        if positive_hits > 0 and negative_hits > 0:
+            return "mixed"
+        if score > 0:
+            return "positive"
+        if score < 0:
+            return "negative"
+        return "neutral"
 
     # ---------------------------------------------------------------------
     # Explanations (optional but recommended)
